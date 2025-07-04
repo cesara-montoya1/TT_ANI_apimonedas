@@ -1,7 +1,7 @@
-pipeline{
+pipeline {
     agent any
 
-    environment{
+    environment {
         DOCKER_IMAGE = 'monedas-api'
         CONTAINER_NAME = 'monedas-api'
         DOCKER_NETWORK = 'monedas_network'
@@ -10,23 +10,23 @@ pipeline{
         CONTAINER_PORT = '8080'
     }
 
-    stages{
-        stage('Build jar'){
-            steps{
+    stages {
+        stage('Build jar') {
+            steps {
                 sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build image'){
-            steps{
-                dir("${DOCKER_BUILD_DIR}"){
+        stage('Build image') {
+            steps {
+                dir("${DOCKER_BUILD_DIR}") {
                     sh "docker build -t ${DOCKER_IMAGE} ./Containerfile"
                 }
             }
         }
 
-        stage('Deploy container'){
-            steps{
+        stage('Deploy container') {
+            steps {
                 sh "docker run --name ${CONTAINER_NAME} --network ${DOCKER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
             }
         }
