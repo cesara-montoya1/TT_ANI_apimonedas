@@ -13,8 +13,10 @@ pipeline {
     stages {
         stage("Build jar") {
             steps {
-                bash -c "mvn clean package -DskipTests"
-                echo "JAR built successfully"
+                script {
+                    bash -c "mvn clean package -DskipTests"
+                    echo "JAR built successfully"
+                }
             }
         }
         stage("Build image") {
