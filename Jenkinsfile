@@ -1,31 +1,32 @@
-pipeline{
+pipeline {
     agent any
 
-    environment{
-        DOCKER_IMAGE = 'apimonedastt'
-        CONTAINER_NAME = 'dockerapimonedastt'
-        DOCKER_NETWORK = 'dockermonedas_red'
-        DOCKER_BUILD_DIR = 'presentacion'
-        HOST_PORT = '9080'
-        CONTAINER_PORT = '8080'
+    environment {
+        DOCKER_IMAGE = "monedas-api"
+        CONTAINER_NAME = "monedas-api"
+        DOCKER_NETWORK = "monedas_network"
+        DOCKER_BUILD_DIR = "presentacion"
+        HOST_PORT = "8081"
+        CONTAINER_PORT = "8080"
     }
 
-    stages{
-        stage('Compilación Maven'){
-            steps{
-                bat 'mvn clean package -Dskiptests'
+    stages {
+        stage("Build jar") {
+            steps {
+                bash -c "mvn clean package -DskipTests"
+                echo "JAR built successfully"
             }
         }
-        stage('Construir imagen'){
-            steps{
-                dir("${DOCKER_BUILD_DIR}"){
-                    bat "docker build . -t ${DOCKER_IMAGE}"
+        stage("Build image") {
+            steps {
+                dir("${DOCKER_BUILD_DIR}") {
+                    bash -c "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
-        stage('Desplegar contenedor'){
-            steps{
-                bat "docker run --network ${DOCKER_NETWORK} --name ${CONTAINER_NAME} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
+        stage("Deploy container") {
+            steps {
+                bash -c "docker run --name ${CONTAINER_NAME} --network ${DOCKER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
             }
         }
     }
