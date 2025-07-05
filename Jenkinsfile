@@ -15,7 +15,10 @@ pipeline {
     stages {
         stage('Ensure network') {
             steps {
-                sh "podman network create -f ${CONTAINER_NETWORK}"
+                script {
+                    sh "podman network rm -f ${CONTAINER_NETWORK}"
+                    sh "podman network create ${CONTAINER_NETWORK}"
+                }
             }
         }
 
