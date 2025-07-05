@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh """
+                        sh """
                         docker container inspect ${CONTAINER_NAME} >/dev/null 2>&1 && (
                         docker container stop ${CONTAINER_NAME}
                         docker container rm ${CONTAINER_NAME}
