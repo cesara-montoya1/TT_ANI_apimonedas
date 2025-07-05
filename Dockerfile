@@ -1,5 +1,5 @@
 # Imagen base de Maven con Alpine Linux
-FROM docker.io/library/maven:3.8.5-openjdk-17-alpine AS build
+FROM docker.io/library/maven:3.8.5-openjdk-17 AS build
 
 # Establece el directorio de trabajo
 WORKDIR /app
