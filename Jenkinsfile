@@ -16,6 +16,8 @@ pipeline {
         stage('Ensure network') {
             steps {
                 script {
+                    // --- ADDED THIS LINE FOR DEBUGGING XDG_RUNTIME_DIR ---
+                    sh "echo $XDG_RUNTIME_DIR"
                     sh "podman network rm -f ${CONTAINER_NETWORK}"
                     sh "podman network create ${CONTAINER_NETWORK}"
                 }
