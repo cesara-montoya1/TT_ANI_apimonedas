@@ -14,7 +14,7 @@ RUN mvn clean install -DskipTests
 FROM docker.io/library/openjdk:17-jdk-alpine
 
 # Copiar el archivo JAR de la aplicación
-COPY ./app/presentacion/target/presentacion-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/presentacion/target/presentacion-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponer el puerto de la API 
 EXPOSE 8080
