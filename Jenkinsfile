@@ -24,7 +24,7 @@ pipeline {
 
         stage('Prepare DB') {
             steps {
-                sh "podman compose -f ${DOCKER_COMPOSE_FILE} up -d"
+                sh "podman-compose -f ${DOCKER_COMPOSE_FILE} up -d"
             }
         }
 
