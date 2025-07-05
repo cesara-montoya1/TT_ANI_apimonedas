@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: monedas-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: monedas
+    networks:
+      - monedas_network
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d:Z
+
+networks:
+  monedas_network:
+    external: true
+
