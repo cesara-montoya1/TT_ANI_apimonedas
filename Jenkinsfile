@@ -19,22 +19,16 @@ pipeline {
         stage('Verify container') {
             steps {
                 script {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                        sh """
-                        docker container inspect ${CONTAINER_NAME} >/dev/null 2>&1 && (
-                        docker container stop ${CONTAINER_NAME}
-                        docker container rm ${CONTAINER_NAME}
-                        ) || echo "Container '${CONTAINER_NAME}' does not exist."
-                       """
-                    }
+                        sh "docker container rm -f ${CONTAINER_NAME}"
                 }
             }
         }
+    }
 
         stage('Ship container') {
             steps {
                 sh "docker run --name ${CONTAINER_NAME} --network ${DOCKER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
             }
         }
-    }
+}
 }
