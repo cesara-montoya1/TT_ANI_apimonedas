@@ -2,32 +2,46 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'monedas-api'
+        CONTAINER_IMAGE = 'monedas-api'
         CONTAINER_NAME = 'monedas-api'
-        DOCKER_NETWORK = 'monedas_network'
+        CONTAINER_NETWORK = 'monedas_network'
         HOST_PORT = '8081'
         CONTAINER_PORT = '8080'
+
+        // Database specific environment variables
+        DOCKER_COMPOSE_FILE = "docker-compose.yml"
     }
+}
 
     stages {
+        stage('Ensure network') {
+            steps {
+                sh "podman network create -f ${CONTAINER_NETWORK}"
+            }
+        }
+
+        stage('Prepare DB') {
+            steps {
+                sh "podman compose -f ${DOCKER_COMPOSE_FILE} up -d"
+            }
+        }
+
         stage('Compile app and build image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                sh "podman build -t ${CONTAINER_IMAGE} ."
             }
         }
 
         stage('Verify container') {
             steps {
-                script {
-                        sh "docker container rm -f ${CONTAINER_NAME}"
-                }
+                sh "podman container rm -f ${CONTAINER_NAME}"
             }
         }
 
         stage('Ship container') {
             steps {
-                sh "docker run --name ${CONTAINER_NAME} --network ${DOCKER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
+                sh "podman run --name ${CONTAINER_NAME} --network ${CONTAINER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${CONTAINER_IMAGE}"
             }
         }
-}
+    }
 }
