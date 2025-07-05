@@ -23,7 +23,6 @@ pipeline {
                 }
             }
         }
-    }
 
         stage('Ship container') {
             steps {
