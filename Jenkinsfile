@@ -9,9 +9,8 @@ pipeline {
         CONTAINER_PORT = '8080'
 
         // Database specific environment variables
-        DOCKER_COMPOSE_FILE = "docker-compose.yml"
+        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
     }
-}
 
     stages {
         stage('Ensure network') {
