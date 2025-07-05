@@ -29,11 +29,12 @@ pipeline {
                     }
                 }
             }
+        }
 
         stage('Ship container') {
             steps {
                 sh "docker run --name ${CONTAINER_NAME} --network ${DOCKER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${DOCKER_IMAGE}"
             }
         }
-        }
     }
+}
