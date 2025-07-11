@@ -2,26 +2,38 @@ pipeline {
     agent any
 
     environment {
-        KUBECONFIG = credentials('300')
+        KUBECONFIG = credentials('Kubernetes')
     }
 
     stages {
-        stage('Compile app and build image') {
+        stage('Clean previous builds') {
             steps {
-                sh "podman build -t ${CONTAINER_IMAGE} ."
+                script {
+                    sh """
+                    kubectl delete statefulset monedas-db-sfs --ignore-not-found
+                    kubectl delete pvc storage-monedas-db-sfs-0 --ignore-not-found
+                    """
+                }
             }
         }
 
-        stage('Verify container') {
+        stage('Apply manifests') {
             steps {
-                sh "podman container rm -f ${CONTAINER_NAME}"
+                sh "kubectl apply -f _manifiestos/infrastructure/manifests"
             }
         }
 
-        stage('Ship container') {
+        stage('Wait for pod readiness') {
             steps {
-                sh "podman run --name ${CONTAINER_NAME} --network ${CONTAINER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${CONTAINER_IMAGE}"
+                sh "kubectl rollout status statefulset/monedas-db-sfs"
             }
         }
+    }
+    success {
+        echo "Infrastructure shipped successfully!"
+    }
+
+    failure {
+        echo "There was an error shipping infrastructure"
     }
 }
