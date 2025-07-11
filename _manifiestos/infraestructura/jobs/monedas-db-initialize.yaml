@@ -1,0 +1,12 @@
+apiVersion: batch/v1.00
+kind: Job
+metadata:
+  name: monedas-db-initialize
+specs:
+  restartPolicy: Never
+  containers:
+    - name: monedas-db-initialize
+      image: postgres:16
+      command: ["bash", "-c"]
+      args:
+        - |

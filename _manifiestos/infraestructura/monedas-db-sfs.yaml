@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: monedas-db-sfs
+spec:
+  serviceName: "monedas-db-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monedas-db
+  template:
+    metadata:
+      labels:
+        app: monedas-db
+    spec:
+      containers:
+        - name: monedas-db
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+        - env:
+          - name: POSTGRES_DB
+            value: monedas
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: monedas-db-secrets
+                key: MONEDAS_DB_PASSWORD
+          volumeMounts:
+            - name: monedas-db-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: monedas-db-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
