@@ -19,7 +19,7 @@ pipeline {
 
         stage('Apply manifests') {
             steps {
-                sh "kubectl apply -f _manifiestos/infrastructure/manifests"
+                sh "kubectl apply -f _manifiestos/infrastructure"
             }
         }
 
