@@ -28,7 +28,9 @@ pipeline {
                 sh "kubectl rollout status statefulset/monedas-db-sfs"
             }
         }
+    }
 
+    post {
         success {
             echo "Infrastructure shipped successfully!"
         }
