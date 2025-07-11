@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    environment {
+        KUBECONFIG = credentials('300')
+    }
+
+    stages {
+        stage('Compile app and build image') {
+            steps {
+                sh "podman build -t ${CONTAINER_IMAGE} ."
+            }
+        }
+
+        stage('Verify container') {
+            steps {
+                sh "podman container rm -f ${CONTAINER_NAME}"
+            }
+        }
+
+        stage('Ship container') {
+            steps {
+                sh "podman run --name ${CONTAINER_NAME} --network ${CONTAINER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${CONTAINER_IMAGE}"
+            }
+        }
+    }
+}
