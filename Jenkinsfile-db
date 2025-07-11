@@ -28,12 +28,13 @@ pipeline {
                 sh "kubectl rollout status statefulset/monedas-db-sfs"
             }
         }
-    }
-    success {
-        echo "Infrastructure shipped successfully!"
-    }
 
-    failure {
-        echo "There was an error shipping infrastructure"
+        success {
+            echo "Infrastructure shipped successfully!"
+        }
+
+        failure {
+            echo "There was an error shipping infrastructure"
+        }
     }
 }
