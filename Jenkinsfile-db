@@ -36,6 +36,7 @@ pipeline {
                     kubectl delete job monedas-db-initialize --ignore-not-found
                     kubectl apply -f _manifiestos/infrastructure/jobs/monedas-db-initialize.yaml
                     kubectl wait --for=condition=complete job/monedas-db-initialize --timeout=10m
+                    kubectl logs job/monedas-db-initialize
                     """
                 }
             }
