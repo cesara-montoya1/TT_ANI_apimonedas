@@ -53,11 +53,11 @@ specs:
           psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DDL_monedas.sql &>/dev/null
           psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DML_monedas.sql &>/dev/null
       env:
-        - name: PGPASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: monedas-db-secret
-            key: MONEDAS_DB_PASSWORD
+      - name: PGPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: monedas-db-secret
+          key: MONEDAS_DB_PASSWORD
       volumeMounts:
       - name: scripts
         mountPath: /scripts
