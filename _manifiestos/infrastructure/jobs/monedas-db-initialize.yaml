@@ -11,7 +11,7 @@ spec:
       containers:
         - name: monedas-db-initialize
           image: postgres:16
-          command: ["bash", "-c"]
+          command: ["/bin/bash", "-c"]
           args:
           - |
             # Install psql client and psmisc (for sleep)
@@ -89,17 +89,17 @@ spec:
             fi
             echo "DML_monedas.sql executed successfully."
             echo "Database initialization complete. Exiting with success."
-            exit 0 # Explicitly exit with success
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: monedas-db-secrets
-              key: MONEDAS_DB_PASSWORD
-        volumeMounts:
+            exit 0
+          env:
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: monedas-db-secrets
+                key: MONEDAS_DB_PASSWORD
+          volumeMounts:
+          - name: scripts
+            mountPath: /scripts
+        volumes:
         - name: scripts
-          mountPath: /scripts
-      volumes:
-      - name: scripts
-        configMap: 
-          name: monedas-db-cm-init
+          configMap: 
+            name: monedas-db-cm-init
