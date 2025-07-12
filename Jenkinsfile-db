@@ -28,6 +28,18 @@ pipeline {
                 sh "kubectl rollout status statefulset/monedas-db-sfs"
             }
         }
+
+        stage('Execute initial scripts') {
+            steps {
+                script {
+                    sh """
+                    kubectl delete job monedas-db-initialize --ignore-not-found
+                    kubectl apply -f _manifiestos/infrastructure/jobs/monedas-db-initialize.yaml
+                    kubectl wait --for=condition=complete job/monedas-db-initialize --timeout=10m
+                    """
+                }
+            }
+        }
     }
 
     post {
