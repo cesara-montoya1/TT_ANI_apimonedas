@@ -28,12 +28,12 @@ pipeline {
 
         stage('Register image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD',)]) {
-                    sh """
-                    echo \"$DOCKER_PASSWORD\" | podman login docker.io -u \"$DOCKER_USERNAME\" --password-stdin
-                    podman push ${CONTAINER_IMAGE}
-                    podman logout docker.io
-                    """
+                withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        sh 'echo "$DOCKER_PASSWORD" | podman login docker.io -u "$DOCKER_USERNAME" --password-stdin'
+                        sh "podman push ${CONTAINER_IMAGE}"
+                        sh "podman logout docker.io"
+                    }
                 }
             }
         }
