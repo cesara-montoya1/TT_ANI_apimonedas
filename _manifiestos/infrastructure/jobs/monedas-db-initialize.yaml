@@ -90,16 +90,16 @@ spec:
             echo "DML_monedas.sql executed successfully."
             echo "Database initialization complete. Exiting with success."
             exit 0
-          env:
+        env:
           - name: PGPASSWORD
             valueFrom:
               secretKeyRef:
                 name: monedas-db-secrets
                 key: MONEDAS_DB_PASSWORD
-          volumeMounts:
+        volumeMounts:
           - name: scripts
             mountPath: /scripts
-        volumes:
-        - name: scripts
-          configMap: 
-            name: monedas-db-cm-init
+    volumes:
+      - name: scripts
+        configMap: 
+          name: monedas-db-cm-init

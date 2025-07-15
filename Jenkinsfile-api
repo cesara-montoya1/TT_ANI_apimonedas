@@ -2,11 +2,8 @@ pipeline {
     agent any
 
     environment {
-        CONTAINER_IMAGE = 'monedas-api'
-        CONTAINER_NAME = 'monedas-api'
-        CONTAINER_NETWORK = 'monedas_network'
-        HOST_PORT = '8081'
-        CONTAINER_PORT = '8080'
+        CONTAINER_IMAGE = 'cesaramontoya1/monedas-api:latest'
+        KUBE_CONFIG = credentials('Kubernetes')
     }
 
     stages {
@@ -16,15 +13,44 @@ pipeline {
             }
         }
 
-        stage('Verify container') {
+        stage('Clear manifests and apply new ones') {
             steps {
-                sh "podman container rm -f ${CONTAINER_NAME}"
+                script {
+                    sh """
+                    kubectl delete hpa monedas-api-hpa --ignore-not-found
+                    kubectl delete deployment monedas-api-deployment --ignore-not-found
+                    kubectl delete service monedas-api-service --ignore-not-found
+                    kubectl delete configmap monedas-api-cm --ignore-not-found
+                    """
+                }
             }
         }
 
-        stage('Ship container') {
+        stage('Register image') {
             steps {
-                sh "podman run --name ${CONTAINER_NAME} --network ${CONTAINER_NETWORK} -p ${HOST_PORT}:${CONTAINER_PORT} -d ${CONTAINER_IMAGE}"
+                withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS',)]) {
+                    sh """
+                    podman push ${CONTAINER_IMAGE}
+                    podman logout docker.io
+                    """
+                }
+            }
+        }
+
+        stage('Apply manifests') {
+            steps {
+                sh "kubectl apply -f _manifiestos/api"
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh """
+                    kubectl set image deployment/monedas-api-deployment ${CONTAINER_IMAGE} --record
+                    kubectl rollout status deployment/monedas-api-deployment
+                    """
+                }
             }
         }
     }
