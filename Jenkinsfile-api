@@ -48,7 +48,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    kubectl set image deployment/monedas-api-deployment ${CONTAINER_IMAGE} --record
+                    kubectl set image deployment/monedas-api-deployment monedas-api=${CONTAINER_IMAGE}
                     kubectl rollout status deployment/monedas-api-deployment
                     """
                 }
