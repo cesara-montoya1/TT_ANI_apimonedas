@@ -30,6 +30,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'DockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS',)]) {
                     sh """
+                    echo \"$DOCKER_PASSWORD\" | podman login docker.io -u \"$DOCKER_USERNAME\" --password-stdin"
                     podman push ${CONTAINER_IMAGE}
                     podman logout docker.io
                     """
