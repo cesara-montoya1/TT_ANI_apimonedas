@@ -50,10 +50,10 @@ spec:
               # Create the 'monedas' database if it does not exist
               # Using IF NOT EXISTS makes this command idempotent
               echo "Creating database '${DB_NAME_MONEDAS}' if it does not exist..."
-              PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c "CREATE DATABASE IF NOT EXISTS ${DB_NAME_MONEDAS};" # &>/dev/null
+              PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c "CREATE DATABASE ${DB_NAME_MONEDAS};" || true 
 
               if [ $? -eq 0 ]; then
-                  echo "Database '${DB_NAME_MONEDAS}' created or already exists."
+                  echo "Database '${DB_NAME_MONEDAS}' created." 
               else
                   echo "Failed to create database '${DB_NAME_MONEDAS}'. Exiting."
                   exit 1
