@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
         - name: monedas-api
-          image: cesaramontoya1/monedas-api
+          image: cesaramontoya1/monedas-api:latest
           ports:
             - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: monedas-api-cm
             - secretRef:
-                name: monedas-api-secrets
+                name: monedas-db-secrets

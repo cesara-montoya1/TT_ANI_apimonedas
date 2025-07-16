@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: monedas-api-cm
 data:
-  URL_DB_MONEDAS: jdbc:postgresql://monedas-api-service:5432/monedas
-  USER_DB_MONEDAS: postgres
+  SPRING_DATASOURCE_URL: jdbc:postgresql://monedas-db-service:5432/monedas
+  SPRING_DATASOURCE_USERNAME: postgres
