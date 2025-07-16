@@ -17,6 +17,9 @@ spec:
               # Install psql client and psmisc (for sleep)
               apt-get update && apt-get install -y postgresql-client psmisc && rm -rf /var/lib/apt/lists/*
 
+              # Wait 5 seconds to ensure the DNS resolution inside the pod
+              sleep 5
+              
               # Define variables
               DB_HOST="monedas-db-service" # Service name for your database
               DB_USER="postgres"
@@ -30,7 +33,7 @@ spec:
               # Wait for Postgres DB to be ready
               echo "Attempting to connect to Postgres DB at $DB_HOST..."
               for i in $(seq 1 $MAX_RETRIES); do
-                psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c '\q' &>/dev/null
+                PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c '\q' &>/dev/null
                 if [ $? -eq 0 ]; then
                   echo "Successfully connected to Postgres DB."
                   break
@@ -47,7 +50,8 @@ spec:
               # Create the 'monedas' database if it does not exist
               # Using IF NOT EXISTS makes this command idempotent
               echo "Creating database '${DB_NAME_MONEDAS}' if it does not exist..."
-              psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c "CREATE DATABASE IF NOT EXISTS ${DB_NAME_MONEDAS};"
+              PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_POSTGRES" -c "CREATE DATABASE IF NOT EXISTS ${DB_NAME_MONEDAS};" &>/dev/null
+
               if [ $? -eq 0 ]; then
                   echo "Database '${DB_NAME_MONEDAS}' created or already exists."
               else
@@ -58,7 +62,7 @@ spec:
               # Wait for the 'monedas' database to be ready
               echo "Attempting to connect to '${DB_NAME_MONEDAS}' DB..."
               for i in $(seq 1 $MAX_RETRIES); do
-                psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -c '\q' &>/dev/null
+                PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -c '\q' &>/dev/null
                 if [ $? -eq 0 ]; then
                   echo "Successfully connected to '${DB_NAME_MONEDAS}' DB."
                   break
@@ -74,7 +78,8 @@ spec:
 
               # Execute SQL scripts
               echo "Executing DDL_monedas.sql..."
-              psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DDL_monedas.sql
+              PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DDL_monedas.sql &>/dev/null
+
               if [ $? -ne 0 ]; then
                   echo "Failed to execute DDL_monedas.sql. Exiting."
                   exit 1
@@ -82,7 +87,7 @@ spec:
               echo "DDL_monedas.sql executed successfully."
 
               echo "Executing DML_monedas.sql..."
-              psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DML_monedas.sql
+              PGPASSWORD="${PGPASSWORD}" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME_MONEDAS" -f /scripts/DML_monedas.sql &>/dev/null
               if [ $? -ne 0 ]; then
                   echo "Failed to execute DML_monedas.sql. Exiting."
                   exit 1
@@ -90,13 +95,13 @@ spec:
               echo "DML_monedas.sql executed successfully."
               echo "Database initialization complete. Exiting with success."
               exit 0
-          env: # This should be aligned with 'args'
+          env:
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: monedas-db-secrets
                   key: MONEDAS_DB_PASSWORD
-          volumeMounts: # This should be aligned with 'args'
+          volumeMounts:
             - name: scripts
               mountPath: /scripts
       volumes:
