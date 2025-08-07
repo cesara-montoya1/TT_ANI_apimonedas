@@ -3,7 +3,7 @@
   "networkMode": "awsvpc",
   "cpu": "256",   
   "memory": "512", 
-  "executionRoleArn": "arn:aws:iam::052737073980:role/ecs-task-execution-role",
+  "executionRoleArn": "arn:aws:iam::052737073980:role/api-monedas-task-role",
   "containerDefinitions": [
     {
       "name": "api-monedas-container", 
