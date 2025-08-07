@@ -19,7 +19,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/api-monedas-tt", 
+          "awslogs-group": "/ecs/api-monedas", 
           "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
         }
